@@ -49,6 +49,7 @@ public class StandardAction<A extends StandardActivity<R, ?>, R extends Op> impl
     private final Timer executeTimer;
     private final Histogram triesHistogram;
     private final Timer resultSuccessTimer;
+    private final Histogram stretchHistogram;
     private final Timer resultTimer;
     private final Timer bindTimer;
     private final NBErrorHandler errorHandler;
@@ -63,6 +64,7 @@ public class StandardAction<A extends StandardActivity<R, ?>, R extends Op> impl
         triesHistogram = activity.getInstrumentation().getOrCreateTriesHistogram();
         resultTimer = activity.getInstrumentation().getOrCreateResultTimer();
         resultSuccessTimer = activity.getInstrumentation().getOrCreateResultSuccessTimer();
+        stretchHistogram = activity.getInstrumentation().getOrCreateStretchHistogram();
         errorHandler = activity.getErrorHandler();
     }
 
@@ -105,10 +107,20 @@ public class StandardAction<A extends StandardActivity<R, ?>, R extends Op> impl
                     error = e;
                 } finally {
                     long nanos = System.nanoTime() - startedAt;
+
                     resultTimer.update(nanos, TimeUnit.NANOSECONDS);
+
                     if (error == null) {
+                        long resultSize = op.getResultSize();
+
                         resultSuccessTimer.update(nanos, TimeUnit.NANOSECONDS);
-                        dispenser.onSuccess(cycle, nanos, op.getResultSize());
+
+                        if (resultSize > 0) {
+                            stretchHistogram.update(nanos / resultSize);
+                        }
+
+                        dispenser.onSuccess(cycle, nanos, resultSize);
+
                         break;
                     } else {
                         ErrorDetail detail = errorHandler.handleError(error, cycle, nanos);

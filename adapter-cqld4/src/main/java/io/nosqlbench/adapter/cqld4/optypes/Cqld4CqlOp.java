@@ -99,6 +99,15 @@ public abstract class Cqld4CqlOp implements CycleOp<ResultSet>, VariableCapture,
     }
 
     @Override
+    public long getResultSize() {
+        if (rs == null) {
+            return 0;
+        }
+
+        return rs.getExecutionInfo().getResponseSizeInBytes();
+    }
+
+    @Override
     public Op getNextOp() {
         Op next = nextOp;
         nextOp = null;
@@ -121,5 +130,4 @@ public abstract class Cqld4CqlOp implements CycleOp<ResultSet>, VariableCapture,
         BoundStatement rebound = LWTRebinder.rebindUnappliedStatement(stmt, row);
         return new Cqld4CqlReboundStatement(session, maxpages, retryreplace, rebound, processors);
     }
-
 }

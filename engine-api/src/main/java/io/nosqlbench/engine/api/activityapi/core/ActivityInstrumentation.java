@@ -119,6 +119,8 @@ public interface ActivityInstrumentation {
      */
     Timer getOrCreateResultSuccessTimer();
 
+    Histogram getOrCreateStretchHistogram();
+
     /**
      * The tries histogram tracks how many tries it takes to complete an operation successfully, or not. This histogram
      * does not encode whether operations were successful or not. Ideally, if every attempt to complete an operation succeeds

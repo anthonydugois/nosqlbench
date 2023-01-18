@@ -55,26 +55,26 @@ public class CoreActivityInstrumentation implements ActivityInstrumentation {
 
     @Override
     public synchronized Timer getOrCreateStridesServiceTimer() {
-        return ActivityMetrics.timer(def, "strides" + SERVICE_TIME,  activity.getHdrDigits());
+        return ActivityMetrics.timer(def, "strides" + SERVICE_TIME, activity.getHdrDigits());
     }
 
     @Override
     public synchronized Timer getStridesResponseTimerOrNull() {
-        if (activity.getStrideLimiter()==null) {
+        if (activity.getStrideLimiter() == null) {
             return null;
         }
-        return ActivityMetrics.timer(def, "strides" + RESPONSE_TIME,  activity.getHdrDigits());
+        return ActivityMetrics.timer(def, "strides" + RESPONSE_TIME, activity.getHdrDigits());
     }
 
 
     @Override
     public synchronized Timer getOrCreateCyclesServiceTimer() {
-        return ActivityMetrics.timer(def, "cycles" + svcTimeSuffix,  activity.getHdrDigits());
+        return ActivityMetrics.timer(def, "cycles" + svcTimeSuffix, activity.getHdrDigits());
     }
 
     @Override
     public synchronized Timer getCyclesResponseTimerOrNull() {
-        if (activity.getCycleLimiter()==null) {
+        if (activity.getCycleLimiter() == null) {
             return null;
         }
         String metricName = "cycles" + RESPONSE_TIME;
@@ -95,26 +95,31 @@ public class CoreActivityInstrumentation implements ActivityInstrumentation {
 
     @Override
     public synchronized Timer getOrCreateBindTimer() {
-        return ActivityMetrics.timer(def, "bind",  activity.getHdrDigits());
+        return ActivityMetrics.timer(def, "bind", activity.getHdrDigits());
     }
 
     @Override
     public synchronized Timer getOrCreateExecuteTimer() {
-        return ActivityMetrics.timer(def,"execute",  activity.getHdrDigits());
+        return ActivityMetrics.timer(def, "execute", activity.getHdrDigits());
     }
 
     @Override
     public synchronized Timer getOrCreateResultTimer() {
-        return ActivityMetrics.timer(def,"result",  activity.getHdrDigits());
+        return ActivityMetrics.timer(def, "result", activity.getHdrDigits());
     }
 
     @Override
     public synchronized Timer getOrCreateResultSuccessTimer() {
-        return ActivityMetrics.timer(def,"result-success",  activity.getHdrDigits());
+        return ActivityMetrics.timer(def, "result-success", activity.getHdrDigits());
+    }
+
+    @Override
+    public synchronized Histogram getOrCreateStretchHistogram() {
+        return ActivityMetrics.histogram(def, "stretch", activity.getHdrDigits());
     }
 
     @Override
     public synchronized Histogram getOrCreateTriesHistogram() {
-        return ActivityMetrics.histogram(def,"tries",  activity.getHdrDigits());
+        return ActivityMetrics.histogram(def, "tries", activity.getHdrDigits());
     }
 }
