@@ -5,7 +5,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
       - name: Set up JDK 17
@@ -13,8 +13,14 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
+      - name: Cache Maven packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
       - name: Build with Maven
-        run: mvn -Drat.skip=true -Dmaven.test.skip=true -Dmaven.javadoc.skip=true package
+        run: mvn --batch-mode -Drat.skip=true -Dmaven.test.skip=true -Dmaven.javadoc.skip=true package
       - name: Docker Login
         uses: docker/login-action@v1.14.1
         with:
