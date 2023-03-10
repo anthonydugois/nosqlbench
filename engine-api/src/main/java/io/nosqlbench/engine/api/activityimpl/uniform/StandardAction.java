@@ -49,7 +49,11 @@ public class StandardAction<A extends StandardActivity<R, ?>, R extends Op> impl
     private final Timer executeTimer;
     private final Histogram triesHistogram;
     private final Timer resultSuccessTimer;
+    private final Timer smallLatencyTimer;
+    private final Timer largeLatencyTimer;
     private final Histogram stretchHistogram;
+    private final Histogram smallStretchHistogram;
+    private final Histogram largeStretchHistogram;
     private final Timer resultTimer;
     private final Timer bindTimer;
     private final NBErrorHandler errorHandler;
@@ -64,7 +68,11 @@ public class StandardAction<A extends StandardActivity<R, ?>, R extends Op> impl
         triesHistogram = activity.getInstrumentation().getOrCreateTriesHistogram();
         resultTimer = activity.getInstrumentation().getOrCreateResultTimer();
         resultSuccessTimer = activity.getInstrumentation().getOrCreateResultSuccessTimer();
+        smallLatencyTimer = activity.getInstrumentation().getOrCreateSmallLatencyTimer();
+        largeLatencyTimer = activity.getInstrumentation().getOrCreateLargeLatencyTimer();
         stretchHistogram = activity.getInstrumentation().getOrCreateStretchHistogram();
+        smallStretchHistogram = activity.getInstrumentation().getOrCreateSmallStretchHistogram();
+        largeStretchHistogram = activity.getInstrumentation().getOrCreateLargeStretchHistogram();
         errorHandler = activity.getErrorHandler();
     }
 
@@ -116,7 +124,17 @@ public class StandardAction<A extends StandardActivity<R, ?>, R extends Op> impl
                         resultSuccessTimer.update(nanos, TimeUnit.NANOSECONDS);
 
                         if (resultSize > 0) {
-                            stretchHistogram.update(nanos / resultSize);
+                            long stretch = nanos / resultSize;
+
+                            stretchHistogram.update(stretch);
+
+                            if (resultSize > 10000) {
+                                largeLatencyTimer.update(nanos, TimeUnit.NANOSECONDS);
+                                largeStretchHistogram.update(stretch);
+                            } else {
+                                smallLatencyTimer.update(nanos, TimeUnit.NANOSECONDS);
+                                smallStretchHistogram.update(stretch);
+                            }
                         }
 
                         dispenser.onSuccess(cycle, nanos, resultSize);

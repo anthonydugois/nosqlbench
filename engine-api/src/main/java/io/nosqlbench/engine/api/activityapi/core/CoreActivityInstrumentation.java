@@ -114,8 +114,28 @@ public class CoreActivityInstrumentation implements ActivityInstrumentation {
     }
 
     @Override
+    public synchronized Timer getOrCreateSmallLatencyTimer() {
+        return ActivityMetrics.timer(def, "small-latency", activity.getHdrDigits());
+    }
+
+    @Override
+    public synchronized Timer getOrCreateLargeLatencyTimer() {
+        return ActivityMetrics.timer(def, "large-latency", activity.getHdrDigits());
+    }
+
+    @Override
     public synchronized Histogram getOrCreateStretchHistogram() {
         return ActivityMetrics.histogram(def, "stretch", activity.getHdrDigits());
+    }
+
+    @Override
+    public synchronized Histogram getOrCreateSmallStretchHistogram() {
+        return ActivityMetrics.histogram(def, "small-stretch", activity.getHdrDigits());
+    }
+
+    @Override
+    public synchronized Histogram getOrCreateLargeStretchHistogram() {
+        return ActivityMetrics.histogram(def, "large-stretch", activity.getHdrDigits());
     }
 
     @Override

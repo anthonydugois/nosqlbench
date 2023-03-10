@@ -119,7 +119,15 @@ public interface ActivityInstrumentation {
      */
     Timer getOrCreateResultSuccessTimer();
 
+    Timer getOrCreateSmallLatencyTimer();
+
+    Timer getOrCreateLargeLatencyTimer();
+
     Histogram getOrCreateStretchHistogram();
+
+    Histogram getOrCreateSmallStretchHistogram();
+
+    Histogram getOrCreateLargeStretchHistogram();
 
     /**
      * The tries histogram tracks how many tries it takes to complete an operation successfully, or not. This histogram
